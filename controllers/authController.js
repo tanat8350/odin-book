@@ -29,6 +29,7 @@ module.exports = {
           data: {
             username: req.body.username,
             password: hashedPassword,
+            displayName: req.body.username,
           },
         });
         res.json(created);

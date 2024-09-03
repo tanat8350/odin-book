@@ -13,27 +13,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id Int @id @default(autoincrement())
-  username String @unique @db.VarChar(255)
-  password String @db.VarChar(255)
-  bio String?
-  profileImage String?
-  following User[] @relation("follow")
-  followedBy User[] @relation("follow")
-  posts Post[]
-}
-
-model Post {
-  id Int @id @default(autoincrement())
-  message String
-  authorid Int
-  author User @relation(fields: [authorid], references: [id])
-}
-
 model Session {
   id String @id
   sid String @unique
   data String
   expiresAt DateTime
 }
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique @db.VarChar(255)
+  password String @db.VarChar(255)
+  displayName String @db.VarChar(255)
+  bio String?
+  profileImage String?
+  following User[] @relation("follow")
+  followedBy User[] @relation("follow")
+  posts Post[] @relation("post")
+  likes Post[]
+  comments Comment[] @relation("comment")
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  message String
+  timestamp DateTime @default(now())
+  authorid Int
+  author User @relation("post",fields: [authorid], references: [id])
+  likes User[]
+  comments Comment[]
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  message String
+  timestamp DateTime @default(now())
+  authorid Int
+  author User @relation("comment",fields: [authorid], references: [id])
+  postid Int
+  post Post @relation(fields: [postid], references: [id])
+}
+
+

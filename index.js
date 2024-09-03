@@ -33,11 +33,12 @@ app.use(
     }),
   })
 );
-app.use(passport.initialize());
 app.use(passport.session());
 require('./configs/passport');
 
 app.use('/', authRouter);
+app.use('/user', require('./routes/user'));
+app.use('/post', require('./routes/post'));
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
