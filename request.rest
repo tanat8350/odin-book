@@ -1,0 +1,23 @@
+@baseurl = http://localhost:3000
+
+### get index
+GET {{baseurl}}
+
+### post signup
+POST {{baseurl}}/signup
+Content-Type: application/json
+
+{
+  "username": "a",
+  "password": "a"
+}
+
+### post login
+POST {{baseurl}}/login
+Authorization: Basic a a
+Content-Type: application/json
+
+{
+  "username": "a",
+  "password": "a"
+}
