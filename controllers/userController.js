@@ -5,6 +5,15 @@ const prisma = require('../configs/prisma');
 const CustomError = require('../utils/CustomError');
 
 module.exports = {
+  getAllUsers: asyncHandler(async (req, res, next) => {
+    const users = await prisma.user.findMany({
+      orderBy: {
+        username: 'asc',
+      },
+    });
+    res.json(users);
+  }),
+
   getUser: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({
       where: {
@@ -54,7 +63,6 @@ module.exports = {
     if (!updated) {
       throw new CustomError('Fail to update user profile', 404);
     }
-
     res.json(updated);
   }),
 };

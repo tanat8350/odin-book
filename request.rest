@@ -21,3 +21,19 @@ Content-Type: application/json
   "username": "a",
   "password": "a"
 }
+
+### like post
+PUT {{baseurl}}/post/1/like
+Content-Type: application/json
+
+{
+  "userid": 1
+}
+
+### like post 2
+PUT {{baseurl}}/post/2/like
+Content-Type: application/json
+
+{
+  "userid": 1
+}

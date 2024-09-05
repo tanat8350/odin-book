@@ -1,4 +1,4 @@
-const prisma = require('./configs/prisma');
+const prisma = require('../configs/prisma');
 
 const posts = [
   {
