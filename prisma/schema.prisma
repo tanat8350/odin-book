@@ -27,8 +27,11 @@ model User {
   displayName String @db.VarChar(255)
   bio String?
   profileImage String?
+  private Boolean @default(false)
   following User[] @relation("follow")
   followedBy User[] @relation("follow")
+  requested User[] @relation("request")
+  requestPending User[] @relation("request")
   posts Post[] @relation("post")
   likes Post[]
   comments Comment[] @relation("comment")

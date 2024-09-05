@@ -37,3 +37,24 @@ Content-Type: application/json
 {
   "userid": 1
 }
+
+### get user
+GET {{baseurl}}/user/3
+
+### update user
+PUT {{baseurl}}/user/2/profile
+Content-Type: application/json
+
+{
+  "displayName": "iamb",
+  "bio": "my name is b",
+  "private": true
+}
+
+### follower request
+POST {{baseurl}}/user/1/follow
+Content-Type: application/json
+
+{
+  "userid": 3
+}
