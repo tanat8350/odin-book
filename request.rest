@@ -13,8 +13,8 @@ Content-Type: application/json
 }
 
 ### post login
-POST {{baseurl}}/login
-Authorization: Basic a a
+POST {{baseurl}}/auth/login
+# Authorization: Basic a a
 Content-Type: application/json
 
 {

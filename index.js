@@ -1,42 +1,20 @@
 const express = require('express');
-const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const passport = require('passport');
-const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
+
+const cloudinary = require('./configs/cloudinary');
 
 const app = express();
 
+app.use(require('cors')());
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static('public'));
-app.use(
-  require('cors')({
-    origin: 'http://localhost:5173',
-    methods: 'GET,POST,PUT,DELETE',
-    credentials: true,
-  })
-);
 
-const authRouter = require('./routes/auth');
-// app.use('/', authRouter);
-app.use(
-  session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 },
-    store: new PrismaSessionStore(require('./configs/prisma'), {
-      checkPeriod: 2 * 60 * 1000,
-      dbRecordIdIsSessionId: true,
-      dbRecordIdFunction: undefined,
-    }),
-  })
-);
-app.use(passport.session());
 require('./configs/passport');
 
-app.use('/', authRouter);
+app.use('/auth', require('./routes/auth'));
 app.use('/user', require('./routes/user'));
 app.use('/post', require('./routes/post'));
 app.get('/', (req, res) => {

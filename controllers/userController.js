@@ -4,6 +4,8 @@ const prisma = require('../configs/prisma');
 
 const CustomError = require('../utils/CustomError');
 
+const { upload } = require('../configs/cloudinary');
+
 module.exports = {
   getAllUsers: asyncHandler(async (req, res, next) => {
     const users = await prisma.user.findMany({
@@ -52,7 +54,6 @@ module.exports = {
   }),
 
   putUpdateUserProfile: asyncHandler(async (req, res, next) => {
-    // to profile image later
     const updated = await prisma.user.update({
       where: {
         id: +req.params.id,
@@ -68,6 +69,38 @@ module.exports = {
     }
     res.json(updated);
   }),
+
+  putUpdateUserProfileImage: [
+    upload.single('profileImage'),
+    asyncHandler(async (req, res, next) => {
+      console.log('file ', req.file);
+      const updated = await prisma.user.update({
+        where: {
+          id: +req.params.id,
+        },
+        data: {
+          profileImage: req.file.path,
+        },
+        include: {
+          following: true,
+          followedBy: true,
+          requested: true,
+          requestPending: true,
+          posts: {
+            include: {
+              author: true,
+              likes: true,
+              comments: true,
+            },
+          },
+        },
+      });
+      if (!updated) {
+        throw new CustomError('Failed to update user profile image', 404);
+      }
+      res.json(updated);
+    }),
+  ],
 
   postFollowRequest: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({
@@ -193,8 +226,4 @@ module.exports = {
     }
     return res.json({ success: true });
   }),
-  // send follow request
-  // accept follow request
-  // remove following
-  // remove follower
 };
