@@ -1,11 +1,27 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
+const passport = require('passport');
 
 const prisma = require('../configs/prisma');
 
 const CustomError = require('../utils/CustomError');
 
 const { upload } = require('../configs/cloudinary');
+const { body, validationResult } = require('express-validator');
+
+const validatePassword = [
+  body('password').isLength({ min: 1 }).withMessage('Password is required'),
+  body('newPassword')
+    .isLength({ min: 1 })
+    .withMessage('New password is required'),
+  body('confirmPassword')
+    .isLength({ min: 1 })
+    .withMessage('Confirm password is required')
+    .custom((value, { req }) => {
+      value === req.body.newPassword;
+    })
+    .withMessage('Passwords do not match'),
+];
 
 module.exports = {
   getAllUsers: asyncHandler(async (req, res, next) => {
@@ -115,25 +131,44 @@ module.exports = {
     }),
   ],
 
-  putUpdatePassword: asyncHandler(async (req, res, next) => {
-    bcrypt.hash(req.body.password, 10, async (err, hash) => {
-      if (err) {
-        return res.status(500).json({ error: err });
+  putUpdatePassword: [
+    validatePassword,
+    async (req, res, next) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array() });
+        ``;
       }
-      const updated = await prisma.user.update({
-        where: {
-          id: +req.params.id,
-        },
-        data: {
-          password: hash,
-        },
-      });
-      if (!updated) {
-        throw new CustomError('Failed to update password', 404);
-      }
-      res.json({ success: true });
-    });
-  }),
+
+      passport.authenticate('local', { session: false }, (err, user, info) => {
+        if (err) {
+          return res.status(500).json({ error: [{ msg: err }] });
+        }
+        if (!user) {
+          return res.status(400).json({ error: [{ msg: info.message }] });
+        }
+        if (user) {
+          bcrypt.hash(req.body.newPassword, 10, async (err, hash) => {
+            if (err) {
+              return res.status(500).json({ error: err });
+            }
+            const updated = await prisma.user.update({
+              where: {
+                id: +req.params.id,
+              },
+              data: {
+                password: hash,
+              },
+            });
+            if (!updated) {
+              throw new CustomError('Failed to update password', 404);
+            }
+            return res.json({ success: true });
+          });
+        }
+      })(req, res, next);
+    },
+  ],
 
   postFollowRequest: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({
