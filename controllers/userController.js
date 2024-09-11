@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const bcrypt = require('bcryptjs');
 
 const prisma = require('../configs/prisma');
 
@@ -113,6 +114,26 @@ module.exports = {
       res.json(updated);
     }),
   ],
+
+  putUpdatePassword: asyncHandler(async (req, res, next) => {
+    bcrypt.hash(req.body.password, 10, async (err, hash) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      const updated = await prisma.user.update({
+        where: {
+          id: +req.params.id,
+        },
+        data: {
+          password: hash,
+        },
+      });
+      if (!updated) {
+        throw new CustomError('Failed to update password', 404);
+      }
+      res.json({ success: true });
+    });
+  }),
 
   postFollowRequest: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({

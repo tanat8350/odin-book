@@ -54,6 +54,14 @@ Content-Type: application/json
   "private": true
 }
 
+### update user password
+PUT {{baseurl}}/user/1/profile/password
+Content-Type: application/json
+
+{
+  "password": "b"
+}
+
 ### follower request
 POST {{baseurl}}/user/1/follow
 Content-Type: application/json
