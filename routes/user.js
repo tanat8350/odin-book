@@ -5,6 +5,7 @@ const userController = require('../controllers/userController');
 
 router.get('/', userController.getAllUsers);
 router.get('/:id', userController.getUser);
+router.delete('/:id', userController.deleteDeleteUser);
 router.get('/:id/profile', userController.getUserProfile);
 router.put('/:id/profile', userController.putUpdateUserProfile);
 router.put('/:id/profile/image', userController.putUpdateUserProfileImage);

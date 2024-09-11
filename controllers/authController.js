@@ -95,12 +95,40 @@ module.exports = {
 
   getAuthGithub: passport.authenticate('github', { scope: ['profile'] }),
 
-  getAuthGithub2: passport.authenticate('github', {
-    successRedirect: 'http://localhost:5173/',
-    failureRedirect: 'http://localhost:5173/',
-  }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  },
+  getAuthGithubCallback: [
+    async (req, res, next) => {
+      passport.authenticate('github', { session: false }, (err, user, info) => {
+        if (err) {
+          return res.status(500).json({ error: [{ msg: err }] });
+        }
+        if (!user) {
+          return res.status(400).json({ error: [{ msg: info.message }] });
+        }
+        if (user) {
+          console.log(user);
+          jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET,
+            async (err, token) => {
+              if (err) {
+                next(err);
+              }
+              const populatedUser = await prisma.user.findFirst({
+                where: { githubid: +user.id },
+                include: {
+                  posts: true,
+                  following: true,
+                  followedBy: true,
+                  requested: true,
+                  requestPending: true,
+                },
+              });
+              res.redirect('http://localhost:5173');
+              // res.json({ token, user: populatedUser });
+            }
+          );
+        }
+      })(req, res, next);
+    },
+  ],
 };

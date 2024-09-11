@@ -41,6 +41,9 @@ Content-Type: application/json
 ### get user
 GET {{baseurl}}/user/3
 
+### delete user
+DELETE {{baseurl}}/user/2
+
 ### update user
 PUT {{baseurl}}/user/2/profile
 Content-Type: application/json

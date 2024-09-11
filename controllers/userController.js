@@ -41,6 +41,18 @@ module.exports = {
     res.json(user);
   }),
 
+  deleteDeleteUser: asyncHandler(async (req, res, next) => {
+    const deleted = await prisma.user.delete({
+      where: {
+        id: +req.params.id,
+      },
+    });
+    if (!deleted) {
+      throw new CustomError('Failed to delete user', 404);
+    }
+    res.json({ success: true });
+  }),
+
   getUserProfile: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({
       where: {

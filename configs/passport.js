@@ -63,25 +63,26 @@ passport.use(
       callbackURL: 'http://localhost:3000/auth/github/callback',
     },
     async function (accessToken, refreshToken, profile, done) {
-      const user = await prisma.user.findUnique({
+      const user = await prisma.user.findFirst({
         where: {
           githubid: +profile.id,
         },
       });
       if (!user) {
-        try {
+        // try {
+        bcrypt.hash('123456', 10, async function (err, hashed) {
           const newUser = await prisma.user.create({
             data: {
-              githubid: profile.id,
               username: profile.username,
-              password: '123456',
+              password: hashed,
               displayName: profile.username,
-              private: false,
+              githubid: +profile.id,
             },
           });
-        } catch {
-          return done(null, false, { message: 'Failed to create user' });
-        }
+        });
+        // } catch {
+        //   return done(null, false, { message: 'Failed to create user' });
+        // }
       }
       process.nextTick(function () {
         return done(null, profile);

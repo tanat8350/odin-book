@@ -35,7 +35,7 @@ model User {
   posts Post[] @relation("post")
   likes Post[]
   comments Comment[] @relation("comment")
-  githubid Int? @unique
+  githubid Int?
 }
 
 model Post {
@@ -43,7 +43,7 @@ model Post {
   message String
   timestamp DateTime @default(now())
   authorid Int
-  author User @relation("post",fields: [authorid], references: [id])
+  author User @relation("post",fields: [authorid], references: [id], onDelete: Cascade)
   likes User[]
   comments Comment[]
 }

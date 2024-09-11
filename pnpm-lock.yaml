@@ -35,9 +35,6 @@ importers:
       express-async-handler:
         specifier: ^1.2.0
         version: 1.2.0
-      express-session:
-        specifier: ^1.18.0
-        version: 1.18.0
       express-validator:
         specifier: ^7.2.0
         version: 7.2.0

@@ -33,28 +33,19 @@ const users = [
   },
 ];
 
-const posts = [
-  {
-    id: 1,
-    message: 'this is post 1',
-    authorid: 1,
-  },
-  {
-    id: 2,
-    message: 'this is post 2',
-    authorid: 1,
-  },
-  {
-    id: 3,
-    message: 'this is post 3 from user 2',
-    authorid: 2,
-  },
-  {
-    id: 4,
-    message: 'this is post 4 from user 3',
-    authorid: 3,
-  },
-];
+const posts = [];
+
+let postCount = 1;
+users.forEach((user) => {
+  for (let i = 0; i < 100; i++) {
+    posts.push({
+      id: postCount,
+      authorid: user.id,
+      message: `post ${postCount} by ${user.id}`,
+    });
+    postCount++;
+  }
+});
 
 const seed = async () => {
   for (const user of users) {
