@@ -67,5 +67,16 @@ POST {{baseurl}}/user/1/follow
 Content-Type: application/json
 
 {
+  "userid": 2
+}
+
+### unfollow
+DELETE  {{baseurl}}/user/3/follow
+Content-Type: application/json
+
+{
   "userid": 3
 }
+
+### get follower
+GET {{baseurl}}/user/3/follower

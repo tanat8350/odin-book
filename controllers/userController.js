@@ -39,9 +39,21 @@ module.exports = {
         id: +req.params.id,
       },
       include: {
-        following: true,
-        followedBy: true,
-        requested: true,
+        following: {
+          orderBy: {
+            displayName: 'asc',
+          },
+        },
+        followedBy: {
+          orderBy: {
+            displayName: 'asc',
+          },
+        },
+        requested: {
+          orderBy: {
+            displayName: 'asc',
+          },
+        },
         requestPending: true,
         posts: {
           include: {
@@ -91,6 +103,19 @@ module.exports = {
         displayName: req.body.displayName,
         bio: req.body.bio,
         private: req.body.private,
+      },
+      include: {
+        following: true,
+        followedBy: true,
+        requested: true,
+        requestPending: true,
+        posts: {
+          include: {
+            author: true,
+            likes: true,
+            comments: true,
+          },
+        },
       },
     });
     if (!updated) {
@@ -169,6 +194,52 @@ module.exports = {
       })(req, res, next);
     },
   ],
+
+  getFollowers: asyncHandler(async (req, res, next) => {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: +req.params.id,
+      },
+      include: {
+        followedBy: {
+          orderBy: {
+            displayName: 'asc',
+          },
+          include: {
+            followedBy: true,
+            requestPending: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new CustomError('Cannot find target user', 404);
+    }
+    res.json(user);
+  }),
+
+  getFollowing: asyncHandler(async (req, res, next) => {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: +req.params.id,
+      },
+      include: {
+        following: {
+          orderBy: {
+            displayName: 'asc',
+          },
+          include: {
+            followedBy: true,
+            requestPending: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new CustomError('Cannot find target user', 404);
+    }
+    res.json(user);
+  }),
 
   postFollowRequest: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 
 const prisma = require('../configs/prisma');
+const { connect } = require('../routes/auth');
 
 const users = [
   {
@@ -73,6 +74,26 @@ const seed = async () => {
       create: post,
     });
     console.log(newPost);
+  }
+
+  for (let i = 1; i <= 4; i++) {
+    await prisma.user.update({
+      where: {
+        id: 3,
+      },
+      data: {
+        following: {
+          connect: {
+            id: i,
+          },
+        },
+        followedBy: {
+          connect: {
+            id: i,
+          },
+        },
+      },
+    });
   }
   console.log('done');
 };
