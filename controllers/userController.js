@@ -55,13 +55,6 @@ module.exports = {
           },
         },
         requestPending: true,
-        posts: {
-          include: {
-            author: true,
-            likes: true,
-            comments: true,
-          },
-        },
       },
     });
     if (!user) {
@@ -194,6 +187,35 @@ module.exports = {
       })(req, res, next);
     },
   ],
+
+  getUserPosts: asyncHandler(async (req, res, next) => {
+    const take = 10;
+    const skip = (+req.query.page - 1) * take || 0;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: +req.params.id,
+      },
+      include: {
+        posts: {
+          take,
+          skip,
+          orderBy: {
+            timestamp: 'desc',
+          },
+          include: {
+            author: true,
+            likes: true,
+            comments: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new CustomError('User not found', 404);
+    }
+    res.json(user.posts);
+  }),
 
   getFollowers: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({

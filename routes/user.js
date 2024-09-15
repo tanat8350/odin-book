@@ -10,6 +10,7 @@ router.get('/:id/profile', userController.getUserProfile);
 router.put('/:id/profile', userController.putUpdateUserProfile);
 router.put('/:id/profile/image', userController.putUpdateUserProfileImage);
 router.put('/:id/profile/password', userController.putUpdatePassword);
+router.get('/:id/post', userController.getUserPosts);
 router.get('/:id/follower', userController.getFollowers);
 router.get('/:id/following', userController.getFollowing);
 router.post('/:id/follow', userController.postFollowRequest);

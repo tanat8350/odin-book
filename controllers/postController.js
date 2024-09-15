@@ -5,7 +5,14 @@ const CustomError = require('../utils/CustomError');
 
 module.exports = {
   getPosts: asyncHandler(async (req, res, next) => {
+    const take = 10;
+    const skip = (+req.query.page - 1) * take || 0;
     const posts = await prisma.post.findMany({
+      orderBy: {
+        timestamp: 'desc',
+      },
+      take,
+      skip,
       include: {
         author: true,
         likes: true,
@@ -13,6 +20,20 @@ module.exports = {
       },
     });
     res.json(posts);
+  }),
+
+  getAllPosts: asyncHandler(async (req, res, next) => {
+    const allPosts = await prisma.post.findMany({
+      orderBy: {
+        timestamp: 'desc',
+      },
+      include: {
+        author: true,
+        likes: true,
+        comments: true,
+      },
+    });
+    res.json(allPosts);
   }),
 
   postPost: asyncHandler(async (req, res, next) => {

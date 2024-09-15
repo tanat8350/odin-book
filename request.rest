@@ -80,3 +80,12 @@ Content-Type: application/json
 
 ### get follower
 GET {{baseurl}}/user/3/follower
+
+### get posts
+GET {{baseurl}}/post HTTP/1.1
+
+### get posts page2
+GET {{baseurl}}/post?page=2 HTTP/1.1
+
+### get user posts
+GET {{baseurl}}/user/1/post HTTP/1.1
