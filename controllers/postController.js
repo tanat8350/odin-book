@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 
 const prisma = require('../configs/prisma');
 const CustomError = require('../utils/CustomError');
+const { uploadImagePost } = require('../configs/cloudinary');
 
 module.exports = {
   getPosts: asyncHandler(async (req, res, next) => {
@@ -36,18 +37,27 @@ module.exports = {
     res.json(allPosts);
   }),
 
-  postPost: asyncHandler(async (req, res, next) => {
-    const post = await prisma.post.create({
-      data: {
+  postPost: [
+    uploadImagePost.single('image'),
+    async (req, res, next) => {
+      const body = {
         message: req.body.message,
         authorid: +req.body.authorid,
-      },
-    });
-    if (!post) {
-      throw new CustomError('Fail to create post', 400);
-    }
-    res.json({ success: true });
-  }),
+      };
+      if (req.file) {
+        body.imageUrl = req.file.path;
+      }
+      console.log(body);
+      const post = await prisma.post.create({
+        data: body,
+      });
+      console.log(post);
+      if (!post) {
+        throw new CustomError('Fail to create post', 400);
+      }
+      res.json({ success: true });
+    },
+  ],
 
   getPost: asyncHandler(async (req, res, next) => {
     const posts = await prisma.post.findUnique({

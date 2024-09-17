@@ -40,7 +40,8 @@ let postCount = 1;
 users.forEach((user) => {
   for (let i = 0; i < 100; i++) {
     posts.push({
-      id: postCount,
+      // with id, auto increment stopped working properly
+      // id: postCount,
       authorid: user.id,
       message: `post ${postCount} by ${user.id}`,
     });
@@ -66,12 +67,8 @@ const seed = async () => {
   }
 
   for (const post of posts) {
-    const newPost = await prisma.post.upsert({
-      where: {
-        id: post.id,
-      },
-      update: post,
-      create: post,
+    const newPost = await prisma.post.create({
+      data: post,
     });
     console.log(newPost);
   }
