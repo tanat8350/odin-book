@@ -18,9 +18,72 @@ module.exports = {
         author: true,
         likes: true,
         comments: true,
+        originalPost: {
+          include: {
+            author: true,
+          },
+        },
+        repostedBy: {
+          include: {
+            author: true,
+          },
+        },
       },
     });
     res.json(posts);
+  }),
+
+  getSearchPosts: asyncHandler(async (req, res, next) => {
+    const take = 10;
+    const skip = (+req.query.page - 1) * take || 0;
+    const searchedPosts = await prisma.post.findMany({
+      take,
+      skip,
+      where: {
+        OR: [
+          {
+            message: {
+              contains: req.query.q,
+            },
+          },
+          {
+            author: {
+              OR: [
+                {
+                  displayName: {
+                    contains: req.query.q,
+                  },
+                },
+                {
+                  username: {
+                    contains: req.query.q,
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+      orderBy: {
+        timestamp: 'desc',
+      },
+      include: {
+        author: true,
+        likes: true,
+        comments: true,
+        originalPost: {
+          include: {
+            author: true,
+          },
+        },
+        repostedBy: {
+          include: {
+            author: true,
+          },
+        },
+      },
+    });
+    res.json(searchedPosts);
   }),
 
   getAllPosts: asyncHandler(async (req, res, next) => {
@@ -32,6 +95,16 @@ module.exports = {
         author: true,
         likes: true,
         comments: true,
+        originalPost: {
+          include: {
+            author: true,
+          },
+        },
+        repostedBy: {
+          include: {
+            author: true,
+          },
+        },
       },
     });
     res.json(allPosts);
@@ -47,17 +120,51 @@ module.exports = {
       if (req.file) {
         body.imageUrl = req.file.path;
       }
-      console.log(body);
       const post = await prisma.post.create({
         data: body,
       });
       console.log(post);
       if (!post) {
-        throw new CustomError('Fail to create post', 400);
+        throw new CustomError('Failed to create post', 400);
       }
       res.json({ success: true });
     },
   ],
+
+  postRepost: asyncHandler(async (req, res, next) => {
+    const repost = await prisma.post.create({
+      data: {
+        message: req.body.message,
+        authorid: +req.body.authorid,
+        originalPostId: +req.params.id,
+      },
+    });
+    if (!repost) {
+      throw new CustomError('Failed to repost', 400);
+    }
+    res.json({ success: true });
+  }),
+
+  getRepostedUsers: asyncHandler(async (req, res, next) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: +req.params.id,
+      },
+      include: {
+        repostedBy: {
+          include: {
+            author: {
+              include: {
+                requestPending: true,
+                followedBy: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    res.json(post.repostedBy);
+  }),
 
   getPost: asyncHandler(async (req, res, next) => {
     const posts = await prisma.post.findUnique({
@@ -68,6 +175,16 @@ module.exports = {
         author: true,
         likes: true,
         comments: {
+          include: {
+            author: true,
+          },
+        },
+        originalPost: {
+          include: {
+            author: true,
+          },
+        },
+        repostedBy: {
           include: {
             author: true,
           },

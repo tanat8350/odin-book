@@ -47,6 +47,9 @@ model Post {
   author User @relation("post",fields: [authorid], references: [id], onDelete: Cascade)
   likes User[]
   comments Comment[]
+  originalPostId Int?
+  originalPost Post? @relation("repost",fields: [originalPostId], references: [id], onDelete: Cascade)
+  repostedBy Post[] @relation("repost")
 }
 
 model Comment {

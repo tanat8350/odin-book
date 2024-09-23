@@ -33,6 +33,30 @@ module.exports = {
     res.json(users);
   }),
 
+  getSearchUsers: asyncHandler(async (req, res, next) => {
+    const take = 10;
+    const skip = (+req.query.page - 1) * take || 0;
+    const searchedUsers = await prisma.user.findMany({
+      take,
+      skip,
+      where: {
+        OR: [
+          {
+            displayName: {
+              contains: req.query.q,
+            },
+          },
+          {
+            username: {
+              contains: req.query.q,
+            },
+          },
+        ],
+      },
+    });
+    res.json(searchedUsers);
+  }),
+
   getUser: asyncHandler(async (req, res, next) => {
     const user = await prisma.user.findUnique({
       where: {
@@ -207,6 +231,11 @@ module.exports = {
             author: true,
             likes: true,
             comments: true,
+            originalPost: {
+              include: {
+                author: true,
+              },
+            },
           },
         },
       },
