@@ -37,6 +37,7 @@ model User {
   comments Comment[] @relation("comment")
   githubid Int?
   chat Chat[] @relation("chat")
+  chatRoom ChatRoom[]
 }
 
 model Post {
@@ -66,8 +67,15 @@ model Comment {
 model Chat {
   id Int @id @default(autoincrement())
   roomId String
+  room ChatRoom @relation("chatroom", fields: [roomId], references: [id])
   message String
   timestamp DateTime
   authorid Int
   author User @relation("chat", fields: [authorid], references: [id])
+}
+
+model ChatRoom {
+  id String @id
+  users User[]
+  chats Chat[] @relation("chatroom")
 }

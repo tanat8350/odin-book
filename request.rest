@@ -92,3 +92,6 @@ GET {{baseurl}}/user/1/post HTTP/1.1
 
 ### get reposted users
 GET {{baseurl}}/post/407/repost/user HTTP/1.1
+
+### get user chats
+GET {{baseurl}}/chat/user/1 HTTP/1.1

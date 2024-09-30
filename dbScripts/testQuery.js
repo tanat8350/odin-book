@@ -1,4 +1,3 @@
-const e = require('express');
 const prisma = require('../configs/prisma');
 
 const main = async () => {

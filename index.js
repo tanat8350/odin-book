@@ -23,11 +23,41 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', async (data) => {
     const message = {
-      message: data.message,
-      authorid: data.author.id,
       roomId: data.roomId,
+      message: data.message,
       timestamp: new Date(),
+      authorid: data.author.id,
     };
+    const room = await prisma.chatRoom.findUnique({
+      where: {
+        id: data.roomId,
+      },
+    });
+    if (!room) {
+      try {
+        const [user1, user2] = data.roomId.split('-');
+        const newRoom = await prisma.chatRoom.create({
+          data: {
+            id: data.roomId,
+            users: {
+              connect: [
+                {
+                  id: +user1,
+                },
+                {
+                  id: +user2,
+                },
+              ],
+            },
+          },
+        });
+        if (!newRoom) {
+          throw new Error('Failed to create new room');
+        }
+      } catch (e) {
+        throw new Error(e);
+      }
+    }
     try {
       const chat = await prisma.chat.create({
         data: message,
